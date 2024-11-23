@@ -1,0 +1,101 @@
+METADATA: {"category": "maintenance_schedule", "processing_date": "2024-11-23T00:15:55.658766", "source_file": "maintenance_schedule.txt"}
+
+PREVENTIVE MAINTENANCE SCHEDULE - Q2 2024
+Facility: Solar Farm Complex Alpha
+Department: Operations & Maintenance
+Last Updated: March 20, 2024
+
+=== APRIL 2024 ===
+
+Week 1 (April 1-7)
+* Daily Tasks
+- Visual inspection of solar panels: Zones A1-A4
+- Check inverter display readings
+- Monitor SCADA system alerts
+
+* Weekly Tasks
+- Clean monitoring sensors
+- Verify data logging system
+- Test emergency shutdown procedures
+
+* Monthly Tasks
+- Thermal imaging scan of critical components
+- Calibrate weather stations
+- Update maintenance logs
+
+Critical Maintenance:
+> Turbine SF-TRB-2024-103
+  Date: April 3, 2024
+  Time: 08:00-16:00
+  Type: Preventive
+  Tasks: 
+  - Rotor balancing
+  - Bearing inspection
+  - Vibration analysis
+  Personnel: Team A (Lead: J. Martinez)
+  Equipment needed: 
+  - Laser alignment tool
+  - Vibration analyzer
+  - Thermal camera
+
+> Inverter Bank 12
+  Date: April 5, 2024
+  Time: 09:00-13:00
+  Type: Routine
+  Tasks:
+  - Clean filters
+  - Check connections
+  - Test efficiency
+  Personnel: Team C (Lead: R. Patel)
+
+Week 2 (April 8-14)
+* Scheduled Maintenance
+- Solar Panel Cleaning: Zones B1-B4
+- Inverter maintenance: Units 15-20
+- Transformer inspection: Sub-station 2
+
+Week 3 (April 15-21)
+* Major Tasks
+- Annual calibration: Power quality meters
+- Replacement: Worn weather sensors
+- Update firmware: SCADA systems
+
+Week 4 (April 22-28)
+* Preventive Maintenance
+- Battery bank capacity testing
+- Ground mount structure inspection
+- Cable termination check
+
+=== MAY 2024 ===
+
+Week 1 (May 1-7)
+* Scheduled Inspections
+- Drone thermal imaging: All zones
+- Power optimizer check
+- Communication system test
+
+[Additional months detailed in maintenance system]
+
+EMERGENCY CONTACTS:
+Operations Manager: Lisa Wong (+1-555-0123)
+Technical Lead: Dr. Sarah Chen (+1-555-0124)
+Emergency Response: (+1-555-0125)
+
+NOTES:
+1. All maintenance activities must follow safety protocols
+2. Document all findings in the maintenance log
+3. Report any anomalies immediately to shift supervisor
+4. Weather-dependent tasks may be rescheduled
+5. Maintain spare parts inventory after each maintenance
+
+Equipment Downtime Restrictions:
+- Maximum 4 hours for routine maintenance
+- 8 hours for major repairs (needs approval)
+- Emergency maintenance: No restrictions
+
+Required PPE:
+- Safety helmets
+- Insulated gloves
+- Safety shoes
+- High-visibility vests
+- Arc flash protection when required
