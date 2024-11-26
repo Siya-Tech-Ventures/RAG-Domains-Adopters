@@ -7,30 +7,58 @@ This repository showcases practical implementations of Retrieval-Augmented Gener
 The repository is organized into domain-specific directories:
 
 ### 🏭 Energy Domain (`/energy`)
-A RAG-powered application focused on energy sector maintenance and operations:
-- Equipment maintenance scheduling and monitoring
-- Intelligent query system for maintenance documentation
-- Interactive dashboard for maintenance insights
+A RAG-powered application focused on predictive maintenance in the energy sector:
+- Equipment maintenance prediction and monitoring
+- Technical documentation analysis
+- Performance data analysis and pattern recognition
+- Real-time monitoring and alerts
+- Customized query interface for maintenance staff
+
+### 💰 Finance Domain (`/finance`)
+A RAG implementation for financial analysis and compliance:
+- Financial document processing
+- Market data analysis
+- Investment insights generation
+
+### 🏥 Healthcare Domain (`/healthcare`)
+A regulatory compliance assistant powered by Google's Gemini Pro:
+- Healthcare regulatory document analysis
+- Interactive compliance query system
+- Source context display for transparency
+- Automatic question generation from documents
+- Support for PDF and text documents
 
 ### 🏘️ Real Estate Domain (`/realestate`)
-A RAG implementation for real estate document analysis:
-- Property agreement analysis
-- Document querying system
-- Interactive data visualization
+A comprehensive real estate analysis system:
+- Property listing and market data analysis
+- Legal document processing for agreements
+- Market trend identification
+- Automated property valuation insights
+- Contract analysis and legal clause detection
+
+### 🏏 Sports Domain (`/sports`)
+A cricket match analysis system powered by Google's Gemini Pro:
+- Comprehensive match analysis and statistics
+- Partnership and player performance tracking
+- Phase-wise analysis (powerplay, middle overs, death overs)
+- Risk analysis and scoring patterns
+- Interactive match visualization
 
 ## Features
 
 - **Domain-Specific RAG Implementations**: Each domain showcases tailored RAG solutions
+- **Multiple LLM Support**: Integration with both OpenAI and Google's Gemini Pro
 - **Interactive Web Interfaces**: Built with Streamlit for user-friendly interaction
 - **Document Processing**: Efficient ingestion and processing of domain-specific documents
-- **Intelligent Querying**: Natural language querying powered by OpenAI
-- **Visualization**: Interactive data visualization using Plotly
+- **Intelligent Querying**: Natural language querying with context-aware responses
+- **Visualization**: Interactive data visualization and insights
 
 ## Prerequisites
 
 - Python 3.8+
-- OpenAI API key
-- Required Python packages (specified in each domain's `requirements.txt`)
+- OpenAI API key (for OpenAI-based implementations)
+- Google API key (for Gemini Pro implementations)
+- Required Python packages (specified in each domain's `requirements.txt` or `environment.yml`)
 
 ## Installation
 
@@ -40,31 +68,31 @@ A RAG implementation for real estate document analysis:
    cd RAG-Domains-Adopters
    ```
 
-2. Set up environment for specific domain:
+2. Choose your preferred setup method for specific domain:
+
+   ### Using Conda (Recommended)
    ```bash
-   cd <domain-directory>  # energy or realestate
+   cd <domain-directory>
+   conda env create -f environment.yml
+   conda activate <domain>-rag
+   ```
+
+   ### Using Python venv
+   ```bash
+   cd <domain-directory>
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
    ```
 
 3. Set up environment variables:
-   - Copy `.env.template` to `.env`
-   - Add your OpenAI API key to `.env`
+   - Copy `.env.template` to `.env` in the domain directory
+   - Add required API keys to `.env`
 
-## Usage
-
-Each domain has its own application that can be run independently:
-
-### Energy Domain
-```bash
-cd energy
-streamlit run app.py
-```
-
-### Real Estate Domain
-```bash
-cd realestate
-streamlit run app.py
-```
+4. Run the application:
+   ```bash
+   streamlit run app.py
+   ```
 
 ## Contributing
 
