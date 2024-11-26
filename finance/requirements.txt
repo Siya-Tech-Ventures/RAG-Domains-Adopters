@@ -1,0 +1,15 @@
+google-cloud-aiplatform>=1.36.0
+langchain>=0.3.8
+langchain-openai>=0.2.9
+langchain-community>=0.3.8
+openai>=1.55.0
+chromadb>=0.4.22
+pandas>=2.1.4
+beautifulsoup4>=4.12.2
+requests>=2.31.0
+python-dotenv>=1.0.0
+yfinance>=0.2.33
+sec-api>=1.0.17
+newsapi-python>=0.2.7
+tiktoken>=0.8.0
+streamlit>=1.31.0
