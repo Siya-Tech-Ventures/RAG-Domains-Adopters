@@ -17,3 +17,5 @@ dependencies:
     - python-dotenv>=1.0.0
     - tiktoken>=0.5.2
     - streamlit>=1.29.0
+    - beautifulsoup4>=4.12.2
+    - PyPDF2==3.0.1
