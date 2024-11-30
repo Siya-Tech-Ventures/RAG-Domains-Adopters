@@ -115,10 +115,11 @@ def main():
                         st.markdown("### Answer")
                         st.write(response["answer"])
                         
-                        # Show the context in an expander
-                        with st.expander("View Match Context"):
-                            st.markdown("### Retrieved Match Data")
-                            st.write(response["context"])
+                        # Show the source documents in an expander
+                        with st.expander("View Source Documents"):
+                            st.markdown("### Source Match Data")
+                            for doc in response["source_documents"]:
+                                st.write(doc)
                             
                             # Show metadata if available
                             if "metadata" in response:
