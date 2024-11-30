@@ -1,116 +1,201 @@
 import streamlit as st
-from financial_rag import FinancialRAG
-import logging
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+from datetime import datetime, timedelta
+import os
+from rag_engine import FinanceRAG
+from dotenv import load_dotenv
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Load environment variables
+load_dotenv()
 
-# Set page config
+# Function to get OpenAI API key
+def get_openai_api_key():
+    """Get OpenAI API key from environment variable or user input"""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        return api_key
+    return None
+
+# Function to check if API key is valid (basic check)
+def is_api_key_valid(api_key):
+    """Basic validation of API key format"""
+    if not api_key:
+        return False
+    # Check if key starts with "sk-" and has reasonable length
+    return api_key.startswith("sk-") and len(api_key) > 20
+
+# Page configuration
 st.set_page_config(
-    page_title="Financial ESG Analysis",
-    page_icon="💹",
+    page_title="Finance RAG System",
+    page_icon="💰",
     layout="wide"
 )
 
 # Initialize session state
-if 'rag' not in st.session_state:
-    st.session_state.rag = FinancialRAG()
-if 'knowledge_base_created' not in st.session_state:
-    st.session_state.knowledge_base_created = False
+if 'rag_system' not in st.session_state:
+    st.session_state.rag_system = None
+if 'api_key_valid' not in st.session_state:
+    st.session_state.api_key_valid = False
 
-# Title and description
-st.title("Financial ESG Analysis Dashboard 💹")
-st.markdown("""
-This application helps you analyze companies based on their ESG (Environmental, Social, and Governance) practices
-using SEC filings, news articles, and stock information.
-""")
-
-# Sidebar for company input
+# Sidebar for configuration
 with st.sidebar:
-    st.header("Company Information")
-    company_ticker = st.text_input("Enter Company Ticker (e.g., AAPL)").upper()
-    company_name = st.text_input("Enter Company Name (e.g., Apple)")
+    st.title("💰 Finance RAG")
     
-    if st.button("Create Knowledge Base"):
-        if company_ticker and company_name:
-            with st.spinner("Creating knowledge base... This might take a minute..."):
-                try:
-                    st.session_state.rag.create_knowledge_base(company_ticker, company_name)
-                    st.session_state.knowledge_base_created = True
-                    st.success("Knowledge base created successfully!")
-                except Exception as e:
-                    st.error(f"Error creating knowledge base: {str(e)}")
-        else:
-            st.warning("Please enter both company ticker and name.")
-
-# Main content area
-if st.session_state.knowledge_base_created:
-    # Query Categories
-    st.header("Ask Questions")
-    query_category = st.selectbox(
-        "Select a category for your question:",
-        ["ESG Overview", "Environmental", "Social", "Governance", "Financial Performance", "Custom Question"]
-    )
-
-    # Predefined questions based on category
-    if query_category == "Custom Question":
-        query = st.text_input(
-            "Enter your question:",
-            placeholder="Type your question here..."
+    # Get API key from environment or user
+    api_key = get_openai_api_key()
+    if not api_key:
+        api_key = st.text_input(
+            "OpenAI API Key (Required)", 
+            type="password",
+            help="Enter your OpenAI API key. The key will not be stored permanently."
         )
-    else:
-        questions = {
-            "ESG Overview": [
-                f"What are {company_name}'s main ESG initiatives and commitments?",
-                f"What is {company_name}'s overall approach to sustainability?",
-                f"How does {company_name} report its ESG metrics?",
-                f"What are the key ESG risks and opportunities for {company_name}?"
-            ],
-            "Environmental": [
-                f"What are {company_name}'s environmental initiatives and goals?",
-                f"How does {company_name} manage its carbon footprint?",
-                f"What renewable energy commitments has {company_name} made?",
-                f"How does {company_name} handle waste management and recycling?"
-            ],
-            "Social": [
-                f"What are {company_name}'s diversity and inclusion initiatives?",
-                f"How does {company_name} manage its supply chain responsibility?",
-                f"What community engagement programs does {company_name} have?",
-                f"How does {company_name} ensure fair labor practices?"
-            ],
-            "Governance": [
-                f"What is {company_name}'s board structure and diversity?",
-                f"How does {company_name} handle business ethics?",
-                f"What are {company_name}'s anti-corruption policies?",
-                f"How transparent is {company_name}'s ESG reporting?"
-            ],
-            "Financial Performance": [
-                f"What is {company_name}'s current market position?",
-                f"How does {company_name}'s ESG performance impact its financial results?",
-                f"What are {company_name}'s key financial metrics?",
-                f"How does {company_name}'s sustainability initiatives affect its business model?"
-            ]
-        }
-        query = st.selectbox("Select a question:", questions[query_category])
     
-    if query:
-        with st.spinner("Analyzing..."):
+    # Validate API key
+    if api_key:
+        if is_api_key_valid(api_key):
+            st.session_state.api_key_valid = True
+            os.environ["OPENAI_API_KEY"] = api_key
+            st.success("API key is valid! ✅")
+        else:
+            st.session_state.api_key_valid = False
+            st.error("Invalid API key format. Please check your key.")
+    
+    # Data directory input
+    data_dir = st.text_input("Data Directory", "sample_data")
+    processed_docs_dir = os.path.join(data_dir, "processed_docs")
+    
+    # Create processed_docs directory if it doesn't exist
+    if not os.path.exists(processed_docs_dir):
+        os.makedirs(processed_docs_dir)
+    
+    # Initialize systems button
+    if st.button("Initialize Systems"):
+        if not st.session_state.api_key_valid:
+            st.error("Please provide a valid OpenAI API key first!")
+        else:
             try:
-                response = st.session_state.rag.query_knowledge_base(query)
-                st.markdown("### Answer")
-                st.write(response)
+                st.session_state.rag_system = FinanceRAG(processed_docs_dir)
+                st.session_state.rag_system.load_documentation()
+                st.success("Systems initialized successfully!")
             except Exception as e:
-                st.error(f"Error processing query: {str(e)}")
-        
-        # Option to analyze greenwashing
-        if st.button("Analyze Greenwashing"):
-            with st.spinner("Analyzing potential greenwashing..."):
-                try:
-                    greenwashing_analysis = st.session_state.rag.analyze_greenwashing(company_name)
-                    st.markdown("### Greenwashing Analysis")
-                    st.write(greenwashing_analysis)
-                except Exception as e:
-                    st.error(f"Error analyzing greenwashing: {str(e)}")
+                st.error(f"Error initializing systems: {str(e)}")
+
+# Main content
+st.title("Finance RAG System")
+
+# Check if API key is valid before showing main content
+if not st.session_state.api_key_valid:
+    st.warning("Please enter a valid OpenAI API key in the sidebar to continue.")
 else:
-    st.info("👈 Please enter company information and create a knowledge base to start analyzing.")
+    # Create tabs
+    tab1, tab2, tab3 = st.tabs(["Market Analysis", "Documentation Query", "Upload Files"])
+    
+    # Market Analysis Tab
+    with tab1:
+        st.header("Market Analysis")
+        if st.session_state.rag_system:
+            query = st.text_input("Enter your market analysis query:")
+            if query:
+                try:
+                    response = st.session_state.rag_system.query_documentation(query, "market_analysis")
+                    st.write(response)
+                except Exception as e:
+                    st.error(f"Error processing query: {str(e)}")
+        else:
+            st.warning("Please initialize the system first!")
+    
+    # Documentation Query Tab
+    with tab2:
+        st.header("Documentation Query")
+        
+        if st.session_state.rag_system:
+            # Category selection
+            categories = st.session_state.rag_system.get_available_categories()
+            category = st.selectbox("Select Category", categories)
+            
+            # Query input
+            query = st.text_input("Enter your query:")
+            if query:
+                try:
+                    response = st.session_state.rag_system.query_documentation(query, category)
+                    st.write(response)
+                except Exception as e:
+                    st.error(f"Error processing query: {str(e)}")
+        else:
+            st.warning("Please initialize the system first!")
+    
+    # Upload Files Tab
+    with tab3:
+        st.header("Upload Files")
+        
+        # File category selection
+        category = st.selectbox(
+            "Select Document Category",
+            ["market_analysis", "financial_reports", "investment_strategies", "risk_management"]
+        )
+        
+        # Multiple file uploader
+        uploaded_files = st.file_uploader(
+            "Choose files to upload", 
+            type=['txt', 'pdf', 'doc', 'docx'],
+            accept_multiple_files=True
+        )
+        
+        if uploaded_files:
+            if st.session_state.rag_system:
+                # Create a progress bar
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                
+                processed_files = []
+                failed_files = []
+                
+                for idx, uploaded_file in enumerate(uploaded_files):
+                    try:
+                        # Update progress
+                        progress = (idx + 1) / len(uploaded_files)
+                        progress_bar.progress(progress)
+                        status_text.text(f"Processing file {idx + 1} of {len(uploaded_files)}: {uploaded_file.name}")
+                        
+                        # Create a temporary file to store the uploaded content
+                        temp_file_path = os.path.join(data_dir, uploaded_file.name)
+                        with open(temp_file_path, "wb") as f:
+                            f.write(uploaded_file.getvalue())
+                        
+                        # Process the uploaded file
+                        processed_path = st.session_state.rag_system._process_document(temp_file_path, category)
+                        processed_files.append(uploaded_file.name)
+                        
+                        # Remove temporary file
+                        os.remove(temp_file_path)
+                        
+                    except Exception as e:
+                        failed_files.append((uploaded_file.name, str(e)))
+                
+                # Clear progress bar and status text
+                progress_bar.empty()
+                status_text.empty()
+                
+                # Reload documentation in RAG system after processing all files
+                if st.session_state.rag_system:
+                    st.session_state.rag_system.load_documentation()
+                
+                # Show results
+                if processed_files:
+                    st.success(f"Successfully processed {len(processed_files)} files:")
+                    for file in processed_files:
+                        st.write(f"✅ {file}")
+                
+                if failed_files:
+                    st.error(f"Failed to process {len(failed_files)} files:")
+                    for file, error in failed_files:
+                        st.write(f"❌ {file}: {error}")
+                
+            else:
+                st.warning("Please initialize the systems first using the button in the sidebar.")
+
+# Footer
+st.markdown("---")
+st.markdown("Finance RAG System - Powered by OpenAI and LangChain")

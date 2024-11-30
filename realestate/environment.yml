@@ -1,18 +1,19 @@
-name: real-estate-rag
+name: realestate-rag
 channels:
   - conda-forge
   - defaults
 dependencies:
   - python=3.10
-  - pip>=23.0
+  - pip
   - pip:
-    - langchain==0.0.350
-    - chromadb==0.4.22
-    - openai==1.3.7
-    - python-dotenv==1.0.0
-    - streamlit==1.29.0
-    - pandas==2.1.4
-    - numpy==1.26.2
-    - beautifulsoup4==4.12.2
-    - requests==2.31.0
-    - PyPDF2==3.0.1
+    - plotly>=5.18.0
+    - langchain>=0.1.0,<0.2.0
+    - langchain-community>=0.0.10,<0.1.0
+    - langchain-core>=0.1.10,<0.2.0
+    - openai>=1.3.7
+    - pandas>=2.1.4
+    - numpy>=1.26.2
+    - chromadb>=0.4.22
+    - python-dotenv>=1.0.0
+    - tiktoken>=0.5.2
+    - streamlit>=1.29.0
