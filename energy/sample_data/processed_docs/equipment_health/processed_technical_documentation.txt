@@ -1,3 +1,5 @@
+METADATA: {"category": "equipment_health", "processing_date": "2024-11-30T09:38:00.356820", "source_file": "technical_documentation.txt"}
+
 SOLAR FARM TECHNICAL DOCUMENTATION
 Document ID: TD-2024-156
 Version: 2.1

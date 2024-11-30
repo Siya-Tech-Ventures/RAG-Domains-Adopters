@@ -102,12 +102,13 @@ if not st.session_state.api_key_valid:
     st.warning("Please provide a valid OpenAI API key in the sidebar to use the system.")
     st.stop()
 
-# Tabs for different functionalities
-tab1, tab2, tab3, tab4 = st.tabs([
+# Create tabs
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Equipment Health", 
     "Documentation Query",
     "Maintenance Schedule", 
-    "Data Management"
+    "Data Management",
+    "Upload Files"
 ])
 
 # Equipment Health Tab
@@ -210,6 +211,76 @@ with tab4:
                 st.error(f"Error refreshing data: {str(e)}")
         else:
             st.warning("Please initialize the system first!")
+
+# Upload Files Tab
+with tab5:
+    st.header("Upload Files")
+    
+    # File category selection
+    category = st.selectbox(
+        "Select Document Category",
+        ["equipment_health", "maintenance_schedule", "technical_documentation", "data_ingestion"]
+    )
+    
+    # Multiple file uploader
+    uploaded_files = st.file_uploader(
+        "Choose files to upload", 
+        type=['txt', 'pdf', 'doc', 'docx'],
+        accept_multiple_files=True
+    )
+    
+    if uploaded_files:
+        if st.session_state.ingestion_system:
+            # Create a progress bar
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            processed_files = []
+            failed_files = []
+            
+            for idx, uploaded_file in enumerate(uploaded_files):
+                try:
+                    # Update progress
+                    progress = (idx + 1) / len(uploaded_files)
+                    progress_bar.progress(progress)
+                    status_text.text(f"Processing file {idx + 1} of {len(uploaded_files)}: {uploaded_file.name}")
+                    
+                    # Create a temporary file to store the uploaded content
+                    temp_file_path = os.path.join(data_dir, uploaded_file.name)
+                    with open(temp_file_path, "wb") as f:
+                        f.write(uploaded_file.getvalue())
+                    
+                    # Process the uploaded file
+                    processed_path = st.session_state.ingestion_system._process_document(temp_file_path, category)
+                    processed_files.append(uploaded_file.name)
+                    
+                    # Remove temporary file
+                    os.remove(temp_file_path)
+                    
+                except Exception as e:
+                    failed_files.append((uploaded_file.name, str(e)))
+            
+            # Clear progress bar and status text
+            progress_bar.empty()
+            status_text.empty()
+            
+            # Reload documentation in RAG system after processing all files
+            if st.session_state.rag_system:
+                st.session_state.rag_system.load_documentation()
+            
+            # Show results
+            if processed_files:
+                st.success(f"Successfully processed {len(processed_files)} files:")
+                for file in processed_files:
+                    st.write(f"✅ {file}")
+            
+            if failed_files:
+                st.error(f"Failed to process {len(failed_files)} files:")
+                for file, error in failed_files:
+                    st.write(f"❌ {file}: {error}")
+            
+        else:
+            st.warning("Please initialize the systems first using the button in the sidebar.")
 
 # Footer
 st.markdown("---")
