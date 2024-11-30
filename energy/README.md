@@ -2,6 +2,11 @@
 
 This system implements a Retrieval-Augmented Generation (RAG) approach for predictive maintenance in the energy sector. It helps analyze equipment documentation, maintenance records, and performance data to predict and prevent potential issues before they occur.
 
+## Live Demo
+🔗 [Energy RAG System](https://energy-rag.streamlit.app/)
+
+![Energy RAG System](energy-rag.webp)
+
 ## Setup
 
 1. Create and activate the conda environment:

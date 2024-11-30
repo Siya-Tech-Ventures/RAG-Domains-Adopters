@@ -2,6 +2,11 @@
 
 A RAG-based chatbot designed to assist with healthcare regulatory compliance queries. The system uses Google's Gemini Pro model combined with OpenAI embeddings to provide accurate information from regulatory documents.
 
+## Live Demo
+🔗 [Healthcare RAG System](https://stv-healthcare-rag.streamlit.app/)
+
+![Healthcare RAG System](healthcare-rag.webp)
+
 ## Features
 
 - Powered by Google's Gemini Pro LLM for response generation

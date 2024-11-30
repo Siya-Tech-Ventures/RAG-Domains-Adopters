@@ -2,6 +2,11 @@
 
 A sophisticated Retrieval-Augmented Generation (RAG) system designed for financial document analysis, market insights, and investment research. This system leverages OpenAI's capabilities to process financial documents, analyze market data, and generate actionable investment insights.
 
+## Live Demo
+🔗 [Finance RAG System](https://stv-finance-rag.streamlit.app/)
+
+![Finance RAG System](finance-rag.webp)
+
 ## Features
 
 ### Document Analysis
