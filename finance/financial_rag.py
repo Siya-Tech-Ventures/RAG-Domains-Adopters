@@ -11,6 +11,8 @@ from langchain_openai import OpenAIEmbeddings, OpenAI
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.docstore.document import Document
 
 # Configure logging
 logging.basicConfig(
@@ -104,7 +106,22 @@ class FinancialRAG:
             logger.error(f"Error fetching stock information: {str(e)}")
             raise
 
-    def create_knowledge_base(self, company_ticker: str, company_name: str):
+    def _process_document(self, file_path: str) -> List[Document]:
+        """Process a document file and return a list of Document objects"""
+        logger.info(f"Processing document: {file_path}")
+        try:
+            if file_path.lower().endswith('.pdf'):
+                loader = PyPDFLoader(file_path)
+                documents = loader.load()
+                logger.info(f"Successfully processed PDF document: {file_path}")
+                return documents
+            else:
+                raise ValueError(f"Unsupported file type for document: {file_path}")
+        except Exception as e:
+            logger.error(f"Error processing document {file_path}: {str(e)}")
+            raise
+
+    def create_knowledge_base(self, company_ticker: str, company_name: str, additional_docs: List[str] = None):
         """Create and populate the vector store with company data"""
         logger.info(f"Creating knowledge base for {company_name} ({company_ticker})")
         try:
@@ -115,6 +132,16 @@ class FinancialRAG:
             
             # Combine all data sources
             all_texts = sec_data + news_data + [stock_data]
+            
+            # Process additional documents if provided
+            if additional_docs:
+                for doc_path in additional_docs:
+                    try:
+                        documents = self._process_document(doc_path)
+                        all_texts.extend([doc.page_content for doc in documents])
+                    except Exception as e:
+                        logger.error(f"Error processing document {doc_path}: {str(e)}")
+                        continue
             
             # Create text splitter
             text_splitter = RecursiveCharacterTextSplitter(

@@ -5,7 +5,8 @@ from langchain.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import DirectoryLoader, TextLoader
+from langchain.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
+from langchain.docstore.document import Document
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -35,6 +36,73 @@ class FinanceRAG:
         self.chroma_dir = os.path.join(os.path.dirname(docs_dir), "chroma_db")
         os.makedirs(self.chroma_dir, exist_ok=True)
         
+    def _process_document(self, file_path: str, category: str) -> str:
+        """
+        Process a document file and add it to the vector store.
+        
+        Args:
+            file_path: Path to the document file
+            category: Category to store the document under
+            
+        Returns:
+            str: Path to the processed document
+        """
+        try:
+            if file_path.lower().endswith('.pdf'):
+                loader = PyPDFLoader(file_path)
+                documents = loader.load()
+            elif file_path.lower().endswith('.txt'):
+                loader = TextLoader(file_path)
+                documents = loader.load()
+            else:
+                raise ValueError(f"Unsupported file type for document: {file_path}")
+
+            # Split documents into chunks
+            texts = self.text_splitter.split_documents(documents)
+            
+            # Create or get vector store for this category
+            persist_dir = os.path.join(self.chroma_dir, f"finance_{category}")
+            if category not in self.vector_stores:
+                self.vector_stores[category] = Chroma(
+                    embedding_function=self.embeddings,
+                    collection_name=f"finance_{category}",
+                    persist_directory=persist_dir
+                )
+                
+                # Create QA chain for this category
+                self.qa_chains[category] = RetrievalQA.from_chain_type(
+                    llm=ChatOpenAI(temperature=0),
+                    chain_type="stuff",
+                    retriever=self.vector_stores[category].as_retriever()
+                )
+            
+            # Add documents to vector store
+            self.vector_stores[category].add_documents(texts)
+            self.vector_stores[category].persist()
+            
+            print(f"Successfully processed and added document: {file_path}")
+            return file_path
+            
+        except Exception as e:
+            print(f"Error processing document {file_path}: {str(e)}")
+            raise
+
+    def process_single_document(self, file_path: str, category: str = "general"):
+        """
+        Process a single document and add it to the vector store.
+        
+        Args:
+            file_path: Path to the document file
+            category: Category to store the document under (default: "general")
+        """
+        try:
+            # Process the document
+            self._process_document(file_path, category)
+            
+        except Exception as e:
+            print(f"Error processing document {file_path}: {str(e)}")
+            raise
+
     def load_documentation(self):
         """Load and process documentation by category."""
         categories = [
