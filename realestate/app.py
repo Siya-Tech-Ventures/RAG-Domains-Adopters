@@ -3,10 +3,16 @@ import os
 import json
 from ingestion import DataIngestion
 from rag_engine import RealEstateRAG
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Initialize RAG and ingestion components
 @st.cache_resource
-def initialize_components():
+def initialize_components(api_key=None):
+    if api_key:
+        os.environ["OPENAI_API_KEY"] = api_key
     rag = RealEstateRAG()
     ingestion = DataIngestion()
     
@@ -27,8 +33,20 @@ def initialize_components():
 def main():
     st.title("Real Estate RAG Assistant ")
     
-    # Initialize components
-    rag, ingestion = initialize_components()
+    # Check if API key exists in environment
+    api_key = os.getenv("OPENAI_API_KEY")
+    
+    # Only show API key input if not found in environment
+    if not api_key:
+        st.sidebar.title("Configuration")
+        api_key = st.sidebar.text_input("Enter OpenAI API Key", type="password")
+        
+        if not api_key:
+            st.warning("Please enter your OpenAI API key in the sidebar or set it in .env file to continue.")
+            st.stop()
+    
+    # Initialize components with API key only if it was provided through UI
+    rag, ingestion = initialize_components(api_key if not os.getenv("OPENAI_API_KEY") else None)
     
     # Sidebar for data ingestion
     st.sidebar.title("Document Ingestion")
