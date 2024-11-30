@@ -8,12 +8,10 @@ from pathlib import Path
 # Load environment variables
 load_dotenv()
 
-def initialize_rag_system():
+def initialize_rag_system(api_key=None):
     """Initialize the RAG system with cricket match data."""
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        st.error("GOOGLE_API_KEY environment variable not set")
-        st.stop()
+    # Use provided API key or get from environment
+    google_api_key = api_key or os.getenv("GOOGLE_API_KEY")
     
     # Get the absolute path to the data directory
     current_dir = Path(__file__).parent
@@ -25,7 +23,7 @@ def initialize_rag_system():
     
     # Initialize RAG system
     try:
-        rag = SportsRAG(data_dir=str(data_dir), google_api_key=api_key)
+        rag = SportsRAG(data_dir=str(data_dir), google_api_key=google_api_key)
         with st.spinner("Loading cricket match data..."):
             # Show progress for data loading
             progress_bar = st.progress(0)
@@ -50,11 +48,7 @@ def initialize_rag_system():
             
     except Exception as e:
         st.error(f"Error initializing RAG system: {str(e)}")
-        st.stop()
-
-# Initialize session state
-if 'rag' not in st.session_state:
-    st.session_state.rag = initialize_rag_system()
+        return None
 
 def main():
     st.title("Cricket Match Analysis RAG System")
@@ -62,6 +56,26 @@ def main():
     A Retrieval-Augmented Generation (RAG) system for cricket match analysis, powered by Google Gemini Pro.
     Ask questions about matches, players, statistics, and tactical decisions.
     """)
+
+    # Check for API key in environment
+    api_key = os.getenv("GOOGLE_API_KEY")
+    
+    # Show API key input if not in environment
+    if not api_key:
+        st.sidebar.title("Configuration")
+        api_key = st.sidebar.text_input("Enter Google API Key", type="password")
+        if not api_key:
+            st.warning("Please enter your Google API key in the sidebar or set GOOGLE_API_KEY in .env file to continue.")
+            st.stop()
+        os.environ["GOOGLE_API_KEY"] = api_key
+
+    # Initialize session state with API key
+    if 'rag' not in st.session_state:
+        st.session_state.rag = initialize_rag_system(api_key if not os.getenv("GOOGLE_API_KEY") else None)
+    
+    if not st.session_state.rag:
+        st.error("Failed to initialize the RAG system. Please check your API key and try again.")
+        st.stop()
 
     # Create tabs for different functionalities
     tab1, tab2, tab3 = st.tabs(["Query Matches", "Add Match Data", "Upload Match File"])
