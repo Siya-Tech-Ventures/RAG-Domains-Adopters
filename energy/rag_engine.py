@@ -31,6 +31,10 @@ class EnergyMaintenanceRAG:
         self.qa_chains = {}
         self.performance_data = None
         
+        # Create persistent directory for ChromaDB
+        self.chroma_dir = os.path.join(os.path.dirname(docs_dir), "chroma_db")
+        os.makedirs(self.chroma_dir, exist_ok=True)
+        
     def load_documentation(self):
         """Load and process documentation by category."""
         categories = [
@@ -48,11 +52,13 @@ class EnergyMaintenanceRAG:
                 documents = loader.load()
                 texts = self.text_splitter.split_documents(documents)
                 
-                # Create vector store for this category
+                # Create vector store for this category with persistent storage
+                persist_dir = os.path.join(self.chroma_dir, f"energy_{category}")
                 self.vector_stores[category] = Chroma.from_documents(
                     documents=texts,
                     embedding=self.embeddings,
-                    collection_name=f"energy_{category}"
+                    collection_name=f"energy_{category}",
+                    persist_directory=persist_dir
                 )
                 
                 # Create QA chain for this category
