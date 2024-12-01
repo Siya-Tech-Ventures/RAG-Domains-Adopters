@@ -3,7 +3,9 @@ import os
 from langchain.document_loaders import DirectoryLoader, TextLoader
 from langchain.schema import Document
 import google.generativeai as genai
-from .cricket_data_loader import process_all_matches
+from .cricket_data_loader import process_all_matches, load_cricket_match
+import json
+from pathlib import Path
 
 class SportsRAG:
     def __init__(self, data_dir: str, google_api_key: str):
@@ -46,6 +48,58 @@ class SportsRAG:
         Question: {question}
 
         Answer: Please provide a detailed answer based on the match data above. Include specific numbers and statistics when available."""
+    
+    def add_new_data(self, text_data: str, metadata: Dict) -> None:
+        """
+        Add new match data to the system
+        
+        Args:
+            text_data (str): The match data text in JSON format
+            metadata (Dict): Metadata about the match (teams, date, event, etc.)
+        """
+        try:
+            # Parse the text data as JSON
+            match_data = json.loads(text_data)
+            
+            # Create a temporary file to process the match data
+            temp_file = Path(self.data_dir) / f"temp_{metadata['teams'][0]}_vs_{metadata['teams'][1]}.json"
+            with open(temp_file, 'w') as f:
+                json.dump(match_data, f)
+            
+            # Process the match data using load_cricket_match
+            processed_text = load_cricket_match(str(temp_file))
+            
+            # Create the final document
+            new_doc = {
+                'text': processed_text,
+                'metadata': metadata
+            }
+            
+            # Add to documents list
+            self.documents.append(new_doc)
+            
+            # Create permanent file
+            teams = '_vs_'.join(metadata['teams'])
+            date = metadata['date'].replace('-', '')
+            filename = f"{teams}_{date}.json"
+            
+            # Ensure the data directory exists
+            data_dir = Path(self.data_dir)
+            data_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Save the original match data
+            file_path = data_dir / filename
+            with open(file_path, 'w') as f:
+                json.dump(match_data, f, indent=2)
+            
+            # Clean up temp file
+            if temp_file.exists():
+                temp_file.unlink()
+                
+        except json.JSONDecodeError:
+            raise Exception("Invalid JSON format in text_data")
+        except Exception as e:
+            raise Exception(f"Failed to save match data: {str(e)}")
     
     def query(self, question: str) -> Dict:
         """

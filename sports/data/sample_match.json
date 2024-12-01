@@ -1,0 +1,79 @@
+{
+  "info": {
+    "teams": ["Mumbai Indians", "Chennai Super Kings"],
+    "dates": ["2024-01-01"],
+    "venue": "Wankhede Stadium",
+    "event": {
+      "name": "Indian Premier League 2024",
+      "match_number": "1"
+    },
+    "match_type": "T20",
+    "toss": {
+      "winner": "Mumbai Indians",
+      "decision": "bat"
+    },
+    "players": {
+      "Mumbai Indians": [
+        "Rohit Sharma",
+        "Ishan Kishan",
+        "Suryakumar Yadav",
+        "Tilak Varma",
+        "Tim David",
+        "Hardik Pandya",
+        "Mohammad Nabi",
+        "Piyush Chawla",
+        "Gerald Coetzee",
+        "Jasprit Bumrah",
+        "Luke Wood"
+      ],
+      "Chennai Super Kings": [
+        "Ruturaj Gaikwad",
+        "Rachin Ravindra",
+        "Ajinkya Rahane",
+        "Daryl Mitchell",
+        "Shivam Dube",
+        "Ravindra Jadeja",
+        "MS Dhoni",
+        "Deepak Chahar",
+        "Tushar Deshpande",
+        "Maheesh Theekshana",
+        "Mustafizur Rahman"
+      ]
+    },
+    "officials": {
+      "umpires": ["Kumar Dharmasena", "Nitin Menon"],
+      "match_referees": ["Javagal Srinath"]
+    }
+  },
+  "innings": [
+    {
+      "team": "Mumbai Indians",
+      "overs": [
+        {
+          "over": 1,
+          "deliveries": [
+            {
+              "batter": "Rohit Sharma",
+              "bowler": "Deepak Chahar",
+              "runs": {
+                "batter": 4,
+                "extras": 0,
+                "total": 4
+              },
+              "extras": {},
+              "comments": ["Beautiful cover drive for four"]
+            }
+          ]
+        }
+      ],
+      "powerplays": [
+        {
+          "from": 0.1,
+          "to": 6.0,
+          "type": "mandatory"
+        }
+      ],
+      "target": {}
+    }
+  ]
+}

@@ -137,17 +137,37 @@ def main():
     # Add Text Data Tab
     with tab2:
         st.header("Add New Match Data")
-        text_data = st.text_area("Enter match analysis or statistics:", 
-                                height=200,
-                                placeholder="Enter match details, player statistics, or tactical observations...")
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            teams = st.text_input("Teams", placeholder="e.g., Team A vs Team B")
-        with col2:
-            event_name = st.text_input("Tournament/Event", placeholder="e.g., Super 50")
-        with col3:
-            match_date = st.date_input("Match Date")
+        # Input fields for match data
+        teams = st.multiselect("Select Teams", ["Team A", "Team B", "Team C"], max_selections=2)
+        match_date = st.date_input("Match Date")
+        event_name = st.text_input("Event Name")
+        
+        # Match details in JSON format
+        st.markdown("""
+        Enter match data in JSON format following this structure:
+        ```json
+        {
+            "info": {
+                "teams": ["Team A", "Team B"],
+                "dates": ["2024-01-01"],
+                "venue": "Stadium Name",
+                "event": {"name": "Tournament Name"},
+                "match_type": "T20",
+                "toss": {
+                    "winner": "Team A",
+                    "decision": "bat"
+                },
+                "players": {
+                    "Team A": ["Player 1", "Player 2"],
+                    "Team B": ["Player 3", "Player 4"]
+                }
+            }
+        }
+        ```
+        """)
+        
+        text_data = st.text_area("Match Data (JSON format)", height=300)
         
         if st.button("Add Match Data"):
             if text_data and teams:
@@ -170,30 +190,72 @@ def main():
     # Upload File Tab
     with tab3:
         st.header("Upload Match Data File")
-        uploaded_file = st.file_uploader("Choose a match data file", type=['txt', 'json'])
+        
+        # Show format instructions
+        st.markdown("""
+        ### File Format Instructions
+        Upload a JSON file containing match data in the following format:
+        ```json
+        {
+            "info": {
+                "teams": ["Team A", "Team B"],
+                "dates": ["2024-01-01"],
+                "venue": "Stadium Name",
+                "event": {
+                    "name": "Tournament Name",
+                    "match_number": "1"
+                },
+                "match_type": "T20",
+                "toss": {
+                    "winner": "Team A",
+                    "decision": "bat"
+                },
+                "players": {
+                    "Team A": ["Player 1", "Player 2", "..."],
+                    "Team B": ["Player 3", "Player 4", "..."]
+                },
+                "officials": {
+                    "umpires": ["Umpire 1", "Umpire 2"],
+                    "match_referees": ["Referee 1"]
+                }
+            },
+            "innings": [
+                {
+                    "team": "Team A",
+                    "overs": [...],
+                    "powerplays": [...],
+                    "target": {...}
+                }
+            ]
+        }
+        ```
+        """)
+        
+        # Add sample file download
+        st.markdown("""
+        ### Sample File
+        You can download a sample match data file to see the exact format:
+        - [View sample file in data folder](file:///{data_dir}/sample_match.json)
+        - [Download sample template](https://raw.githubusercontent.com/Siya-Tech-Ventures/RAG-Domains-Adopters/refs/heads/main/sports/data/wi_211976.json)
+        """)
+        
+        st.markdown("---")
+        
+        uploaded_file = st.file_uploader("Choose a match data file", type=['json'])
         
         if uploaded_file is not None:
             try:
                 # Create a temporary file
-                with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{uploaded_file.name.split(".")[-1]}') as tmp_file:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as tmp_file:
                     tmp_file.write(uploaded_file.getvalue())
                     tmp_file_path = tmp_file.name
 
                 # Add to RAG system
                 with st.spinner("Processing match file..."):
-                    if uploaded_file.name.endswith('.json'):
-                        # For JSON files, we'll use the cricket data loader
-                        st.session_state.rag.add_new_data(
-                            open(tmp_file_path).read(),
-                            {"filename": uploaded_file.name, "format": "json"}
-                        )
-                    else:
-                        # For text files, process normally
-                        content = uploaded_file.getvalue().decode()
-                        st.session_state.rag.add_new_data(
-                            content,
-                            {"filename": uploaded_file.name, "format": "text"}
-                        )
+                    st.session_state.rag.add_new_data(
+                        open(tmp_file_path).read(),
+                        {"filename": uploaded_file.name, "format": "json"}
+                    )
                     st.success(f"File {uploaded_file.name} processed successfully!")
 
                 # Clean up
