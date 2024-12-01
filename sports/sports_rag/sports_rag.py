@@ -6,6 +6,8 @@ import google.generativeai as genai
 from .cricket_data_loader import process_all_matches, load_cricket_match
 import json
 from pathlib import Path
+import uuid
+import datetime
 
 class SportsRAG:
     def __init__(self, data_dir: str, google_api_key: str):
@@ -62,7 +64,7 @@ class SportsRAG:
             match_data = json.loads(text_data)
             
             # Create a temporary file to process the match data
-            temp_file = Path(self.data_dir) / f"temp_{metadata['teams'][0]}_vs_{metadata['teams'][1]}.json"
+            temp_file = Path(self.data_dir) / f"temp_{uuid.uuid4()}.json"
             with open(temp_file, 'w') as f:
                 json.dump(match_data, f)
             
@@ -78,10 +80,10 @@ class SportsRAG:
             # Add to documents list
             self.documents.append(new_doc)
             
-            # Create permanent file
-            teams = '_vs_'.join(metadata['teams'])
-            date = metadata['date'].replace('-', '')
-            filename = f"{teams}_{date}.json"
+            # Generate random filename with timestamp
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            random_id = str(uuid.uuid4())[:8]
+            filename = f"match_{timestamp}_{random_id}.json"
             
             # Ensure the data directory exists
             data_dir = Path(self.data_dir)
