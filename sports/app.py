@@ -235,7 +235,6 @@ def main():
         st.markdown("""
         ### Sample File
         You can download a sample match data file to see the exact format:
-        - [View sample file in data folder](file:///{data_dir}/sample_match.json)
         - [Download sample template](https://raw.githubusercontent.com/Siya-Tech-Ventures/RAG-Domains-Adopters/refs/heads/main/sports/data/wi_211976.json)
         """)
         

@@ -2,6 +2,10 @@
 
 This application demonstrates the power of Retrieval Augmented Generation (RAG) in the real estate domain. It helps users query and analyze real estate documents, listings, market data, and legal documents using natural language processing.
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://stv-realestate-rag.streamlit.app/)
+
+![Real Estate RAG Demo](realestate-rag.webp)
+
 ## Features
 
 - Document ingestion for real estate listings, market reports, and property descriptions

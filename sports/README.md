@@ -2,6 +2,10 @@
 
 A Retrieval-Augmented Generation (RAG) system specifically designed for cricket match analysis, tactical decision-making, and player performance prediction, powered by Google's Gemini Pro.
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://stv-sport-rag.streamlit.app/)
+
+![Cricket Match Analysis Demo](sports-rag.webp)
+
 ## Features
 
 - Query-based cricket match analysis using Google Gemini Pro
